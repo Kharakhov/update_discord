@@ -1,9 +1,10 @@
 #! /bin/bash
 
-# Made by Caedorus.
-# This little script compare the version of the currently installed discord to the latest one, then download and update if required.
+# Made by Caedorus, forked and amended by Kharakhov.
+# This little script compares the version of the currently installed discord to the latest one, then downloads and updates if required.
 # If discord is not installed, it will install it.
-# Compatible with all systems that install discord from a deb package, use dpkg, and sudo. This basically means debian and derivatives.
+# Compatible with all systems that install discord from a deb package, use dpkg, and pkexec. This basically means debian and derivatives.
+# Note: I forked this build from Caedorus at 2026-02-04 13:00 UTC.
 
 update() {
  OLD_VERSION_UNCLEAN=$(dpkg -s discord | grep '^Version:' || echo "123456789None") # the 9 characters get stripped
@@ -16,9 +17,9 @@ update() {
   echo "Updating from $OLD_VERSION to $NEW_VERSION!"
   mkdir -p /tmp/update_discord && pushd /tmp/update_discord # make and go to a temporary directory. pushd ensures we can go back to wherever we used to be
   wget https://discord.com/api/download?platform=linux -O discord_latest.deb || exit 1 # download and fail if the download fails
-  echo "Your password is required to install this update. To cancel, press Ctrl+C."
-  sudo dpkg -i discord_latest.deb || exit 1 # install and fail if the install fails
-  sudo -k # remove the previous authentication record. Otherwise, a malicous discord could get root access without needing a password.
+  echo "Your password is required and will now be prompted for to install this update. To cancel, hit cancel or press Ctrl+C."
+  pkexec dpkg -i discord_latest.deb || exit 1 # install and fail if the install fails
+  pkexec -k # remove the previous authentication record. Otherwise, a malicous discord could get root access without needing a password.
   echo "Cleaning up..."
   popd # return to the previous directory
   rm -rf /tmp/update_discord # clean the temp directory
